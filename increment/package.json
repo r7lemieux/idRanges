@@ -1,0 +1,26 @@
+{
+  "name": "increment",
+  "version": "1.0.0",
+  "description": "counter incrementer",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Richard Lemieux",
+  "license": "MIT",
+  "dependencies": {
+    "@types/bluebird": "^3.0.37",
+    "@types/express": "^4.0.35",
+    "@types/knex": "0.0.41",
+    "app-module-path": "^2.2.0",
+    "bluebird": "^3.4.7",
+    "express": "^4.14.1",
+    "knex": "^0.12.7",
+    "lodash": "^4.17.4",
+    "pg": "^6.1.4",
+    "pg-native": "^1.10.0",
+    "pg-pool": "^1.6.0",
+    "typescript": "^2.1.6"
+  }
+}
