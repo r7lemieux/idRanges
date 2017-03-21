@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const id_service_1 = require("./id-service");
 const express = require("express");
 const app = express();

@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const dynamoService_1 = require("../services/dynamoService");
 class IdService {
     constructor() {

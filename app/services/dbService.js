@@ -7,6 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
 const idManagerDb_1 = require("../id/idManagerDb");
 const util = require('util');
 const pg = require('pg');
@@ -15,19 +16,12 @@ const NativeClient = pg.native.Client;
 const Prom = require('bluebird');
 Prom.promisifyAll(Pool);
 let pool = null;
-const connectDatabase = () => {
+const connectDatabase = (config) => {
     console.log('=> dbService:5 ');
-    const config = {
-        user: 'r7lemieux',
-        database: 'kdr',
-        password: 'q12waq12',
-        host: 'localhost',
-        port: 5510,
-        max: 10,
-        application_name: 'IdManager',
-        idleTimeoutMillis: 30000,
-    };
-    const pool = new Pool(config);
+    const dbConfig = config.db;
+    dbConfig.application_name = 'IdManager';
+    dbConfig.idleTimeoutMillis = 30000;
+    const pool = new Pool(dbConfig);
     pool.on('error', function (error, client) {
         console.log(`=> dbService:37 error ${util.inspect(error)}`);
     });
@@ -82,8 +76,8 @@ const rollback = (client, done) => {
     client.query('ROLLBACK', err => done(err));
     return Prom.reject();
 };
-const init = () => {
-    pool = connectDatabase();
+const init = (config) => {
+    pool = connectDatabase(config);
     pool.query("ALTER DATABASE kdr set search_path='idmanager'");
     idManagerDb_1.idManagerDb.init(pool);
     idManagerDb_1.idManagerDb.createTables();

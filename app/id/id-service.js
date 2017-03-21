@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const idManagerDb_1 = require("./idManagerDb");
 const Prom = require("bluebird");
 class IdService {

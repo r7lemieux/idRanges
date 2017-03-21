@@ -1,0 +1,13 @@
+{
+    "db": {
+      "database": "kdr",
+      "user": "r7lemieux",
+      "password": "q12waq12",
+      "host": "localhost",
+      "port": 5510,
+      "max": 10
+    },
+    "server": {
+      "port": 4010
+    }
+}

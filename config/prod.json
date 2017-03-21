@@ -1,0 +1,12 @@
+{
+    "db": {
+      "database": "kdr",
+      "user": "r7lemieux",
+      "password": "q12waq12",
+      "host": "idmaster.ch738z2epmnh.us-east-1.rds.amazonaws.com",
+      "port": 5432
+    },
+    "server": {
+      "port": 4010
+    }
+  }

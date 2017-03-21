@@ -26,20 +26,13 @@ let pool = null;
 //   return client;
 // };
 
-const connectDatabase = () => {
+const connectDatabase = (config) => {
   console.log('=> dbService:5 ');
-  const config = {
-    user: 'r7lemieux',
-    database: 'kdr',
-    password: 'q12waq12',
-    host: 'localhost',
-    port: 5510,
-    max: 10,
-    application_name: 'IdManager',
-    idleTimeoutMillis: 30000,
-    // Client: NativeClient,
-  };
-  const pool = new Pool(config);
+  const dbConfig = config.db;
+  dbConfig.application_name = 'IdManager';
+  dbConfig.idleTimeoutMillis = 30000;
+  //dbConfig.Client = NativeClient;
+  const pool = new Pool(dbConfig);
   pool.on('error', function (error, client) {
     console.log(`=> dbService:37 error ${util.inspect(error)}`)
   })
@@ -107,8 +100,8 @@ const rollback = (client, done) => {
   return Prom.reject();
 };
 
-const init = () => {
-  pool = connectDatabase();
+const init = (config) => {
+  pool = connectDatabase(config);
   // pool.query('CREATE SCHEMA IF NOT EXISTS idmanager AUTHORIZATION r7lemieux');
   pool.query("ALTER DATABASE kdr set search_path='idmanager'");
   idManagerDb.init(pool);

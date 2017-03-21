@@ -1,5 +1,4 @@
 import {idService} from "./id-service";
-import {Application, Request, Response} from 'express';
 import * as express from 'express'
 
 const app = express();

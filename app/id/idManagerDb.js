@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const util = require("util");
 class IdManagerDb {
     constructor() {
     }
@@ -6,19 +8,30 @@ class IdManagerDb {
         this.pool = pool;
     }
     createTables() {
-        this.createNextIdsTable();
-        this.createIdRangesTable();
+        let client = null;
+        return this.pool.connect()
+            .then(newClient => {
+            client = newClient;
+            return this.createNextIdsTable(client);
+        })
+            .then((ret) => {
+            console.log(`=> idManagerDb:23 ret ${util.inspect(ret)}`);
+            this.createIdRangesTable(client);
+        })
+            .catch((err) => {
+            console.log(`err => Fail to create Tables ${util.inspect(err)}`);
+        });
     }
-    createNextIdsTable() {
-        this.pool.query(`CREATE TABLE IF NOT EXISTS next_ids (
+    createNextIdsTable(client) {
+        client.query(`CREATE TABLE IF NOT EXISTS next_ids (
       name      VARCHAR(40) PRIMARY KEY,
       next_id   INT DEFAULT 1001,
       increment INT DEFAULT 1000,
       mod_time  timestamp DEFAULT current_timestamp
   );`);
     }
-    createIdRangesTable() {
-        this.pool.query(`CREATE TABLE IF NOT EXISTS id_ranges (
+    createIdRangesTable(client) {
+        client.query(`CREATE TABLE IF NOT EXISTS id_ranges (
       id          SERIAL PRIMARY KEY,
       name        VARCHAR (40),
       range_start INT,
