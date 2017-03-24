@@ -103,7 +103,8 @@ const rollback = (client, done) => {
 const init = (config) => {
   pool = connectDatabase(config);
   // pool.query('CREATE SCHEMA IF NOT EXISTS idmanager AUTHORIZATION r7lemieux');
-  pool.query("ALTER DATABASE kdr set search_path='idmanager'");
+  // pool.query("ALTER DATABASE kdr set search_path='idmanager'");
+  pool.query("SET search_path TO 'idmanager'");
   idManagerDb.init(pool);
   idManagerDb.createTables();
   // testDatabase2(pool);

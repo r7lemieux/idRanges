@@ -78,7 +78,7 @@ const rollback = (client, done) => {
 };
 const init = (config) => {
     pool = connectDatabase(config);
-    pool.query("ALTER DATABASE kdr set search_path='idmanager'");
+    pool.query("SET search_path TO 'idmanager'");
     idManagerDb_1.idManagerDb.init(pool);
     idManagerDb_1.idManagerDb.createTables();
 };
