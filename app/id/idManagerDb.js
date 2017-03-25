@@ -40,47 +40,7 @@ class IdManagerDb {
     );`);
     }
     getIncrementSql(name, increment) {
-        var a1 = `IF EXISTS (SELECT * FROM next_ids WHERE name = '${name}') THEN
-              UPDATE next_ids 
-              SET next_id = (c.next_id + c.increment) 
-              FROM (
-                SELECT next_id, increment 
-                  FROM next_ids 
-                  WHERE name = '${name}') AS c 
-              WHERE name = '${name}';
-                
-            INSERT INTO id_ranges (name, range_start, range_end) 
-                SELECT name, next_id, next_id + increment 
-                FROM next_ids 
-                WHERE name = '${name}';   
-         
-            SELECT next_id, increment FROM next_ids 
-              WHERE name = '${name}'
-                
-          ELSE
-          
-            INSERT INTO next_ids (name, next_id) 
-              VALUES ('${name}', 1001);
-                
-            INSERT INTO id_ranges (name, range_start, range_end) 
-              VALUES ( '${name}', 1, 1000 );
-                  
-            SELECT * FROM next_ids WHERE name = '${name}';
-            
-          ENDIF
-          `;
-        var a2 = `IF EXISTS (SELECT * FROM next_ids WHERE name = '${name}') THEN SELECT * FROM next_ids WHERE name = '${name}' ENFDIF`;
-        var a3 = `
-    $insert = "INSERT INTO next_ids (name, next_id) SELECT ('${name}, 1001)";
-    $upsert = "UPDATE next_ids SET next_id=next_id+1000 WHERE name='${name}'";
-    WITH upsert AS ($upsert RETURNING *) $insert WHERE NOT EXISTS (SELECT * FROM upsert);
-    `;
-        const a4 = `
-    WITH upsert AS (UPDATE next_ids SET next_id=next_id+increment WHERE name='${name}' RETURNING *)
-    INSERT INTO next_ids (name, next_id, increment) SELECT '${name}', ${increment} + 1, ${increment} WHERE NOT EXISTS (SELECT * FROM upsert) 
-    RETURNING *;
-    `;
-        const a5 = `
+        return `
        INSERT INTO next_ids (name, next_id, increment)
        VALUES ('${name}', ${increment} + 1, ${increment})
        ON CONFLICT (name) DO UPDATE SET next_id = next_ids.next_id + next_ids.increment;
@@ -92,7 +52,6 @@ class IdManagerDb {
           RETURNING range_start, range_end; 
 
     `;
-        return a5;
     }
     incrementId(name) {
         let client = null;
@@ -104,13 +63,14 @@ class IdManagerDb {
         })
             .then(() => {
             const sql = this.getIncrementSql(name, 500);
-            return client.query(sql, []);
+            return client.query(sql);
         })
             .then(newResult => {
             result = newResult;
             client.query('COMMIT');
         })
             .then(() => {
+            console.log(`=> idManagerDb:83 res ${util.inspect(result)}`);
             if (!result.rows || !result.rows[0]) {
                 return client.query('ROLLBACK', client.release);
             }
@@ -118,7 +78,8 @@ class IdManagerDb {
             const row = result.rows[0];
             return { from: row.range_start, to: row.range_end };
         })
-            .catch(() => {
+            .catch((err) => {
+            console.log(`=> idManagerDb:92 res ${util.inspect(err)}`);
             return client.query('ROLLBACK', client.release);
         });
     }

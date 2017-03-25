@@ -8,11 +8,9 @@ type IdRequestTask = {
 }
 export class IdService {
 
-  protected incrementUrl: string = 'https://kskxxtoe6c.execute-api.us-east-1.amazonaws.com/prod/incr2?counter=';
   protected tables: {[tableName:string]: { tasks: IdRequestTask[], active: boolean}};
   constructor() {
     this.tables = {};
-    console.log(`=> id-service:15 this.tasks ${JSON.stringify(this.tables)}`);
   }
 
   generateId(key: string, res: Response): Prom<any> {
@@ -20,7 +18,6 @@ export class IdService {
       this.tables[key] = { tasks: [], active: false };
     }
     const table = this.tables[key];
-    console.log(`=> id-service:23 key ${key} ${table.tasks.length} tasks ` + (table.active)?'active':'');
     const task: IdRequestTask = {key, res};
     table.tasks.push(task);
     return this.poke(key);
@@ -31,10 +28,8 @@ export class IdService {
     if (!table.active && table.tasks.length) {
       table.active = true;
       const task = table.tasks.shift();
-      console.log(`=> id-service:34 task ${(task)}`);
-      return this.increment(task.key)
+      return idManagerDb.incrementId(task.key)
         .then( res => {
-          console.log(`=> id-service:37  nextId ${JSON.stringify(res)}`);
           task.res.send(res);
           table.active = false;
           return this.poke(key);
@@ -42,12 +37,6 @@ export class IdService {
     } else {
       return Prom.resolve(); // for testing
     }
-  }
-
-  increment(key: string): Prom<any> {
-    let val: number = 0;
-    console.log(`=> id-service:49 key ${JSON.stringify(key)}`);
-    return idManagerDb.incrementId(key);
   }
 
   getAllocatedRanges(name: string, res: Response) {
